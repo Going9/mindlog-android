@@ -44,4 +44,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation("dev.hotwire:core:1.2.5")
     implementation("dev.hotwire:navigation-fragments:1.2.5")
+    implementation("androidx.browser:browser:1.8.0")
 }
