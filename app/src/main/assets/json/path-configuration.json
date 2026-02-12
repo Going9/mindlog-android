@@ -8,6 +8,7 @@
             "properties": {
                 "context": "default",
                 "uri": "hotwire://fragment/web",
+                "animated": false,
                 "pull_to_refresh_enabled": true
             }
         },
@@ -20,6 +21,7 @@
                 "context": "default",
                 "uri": "hotwire://fragment/web",
                 "presentation": "replace",
+                "animated": false,
                 "pull_to_refresh_enabled": false
             }
         },
@@ -30,6 +32,7 @@
             "properties": {
                 "context": "default",
                 "uri": "hotwire://fragment/web",
+                "animated": false,
                 "open_external": true
             }
         }
