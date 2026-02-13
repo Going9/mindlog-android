@@ -1,7 +1,5 @@
 {
-  "settings": {
-    "screenshots_enabled": true
-  },
+  "settings": {},
   "rules": [
     {
       "patterns": [
@@ -10,7 +8,20 @@
       "properties": {
         "context": "default",
         "uri": "hotwire://fragment/web",
-        "pull_to_refresh_enabled": true
+        "pull_to_refresh_enabled": true,
+        "animated": false
+      }
+    },
+    {
+      "patterns": [
+        "/diaries/new$",
+        "/diaries/\\d+$",
+        "/diaries/\\d+/edit$"
+      ],
+      "properties": {
+        "context": "default",
+        "uri": "hotwire://fragment/web",
+        "animated": false
       }
     },
     {
