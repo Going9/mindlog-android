@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+val devBaseUrl = (project.findProperty("MINDLOG_DEV_BASE_URL") as String?) ?: "https://localhost:8443"
+
 android {
     namespace = "com.mindlog.android"
     compileSdk {
@@ -36,7 +38,7 @@ android {
     productFlavors {
         create("dev") {
             dimension = "environment"
-            buildConfigField("String", "BASE_URL", "\"https://127.0.0.1:8443\"")
+            buildConfigField("String", "BASE_URL", "\"$devBaseUrl\"")
         }
         create("prod") {
             dimension = "environment"
