@@ -7,7 +7,6 @@
 
 ## Build Flavors
 - `dev`: `https://10.0.2.2:8443`
-- `stage`: `https://staging.mindlog.blog`
 - `prod`: `https://www.mindlog.blog`
 
 ## Key Rules
