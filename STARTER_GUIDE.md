@@ -6,7 +6,7 @@
 - WebView session exchange (`/auth/exchange`)
 
 ## Build Flavors
-- `dev`: `https://10.0.2.2:8443`
+- `dev`: `https://127.0.0.1:8443` (use `adb reverse tcp:8443 tcp:8443`)
 - `prod`: `https://www.mindlog.blog`
 
 ## Key Rules
@@ -16,6 +16,7 @@
 
 ## Run / Test
 ```bash
+adb reverse tcp:8443 tcp:8443
 ./gradlew assembleDevDebug
 ./gradlew installDevDebug
 ./gradlew testDevDebugUnitTest
@@ -30,4 +31,5 @@
 
 ## Troubleshooting
 - If local HTTPS fails, verify backend cert setup (`mindlog/scripts/setup-local-https-cert.sh`).
+- If app shows only endless spinner on `dev`, verify reverse tunnel with `adb reverse --list`.
 - If login opens in WebView, re-check `open_external` rule for `/auth/login.*`.

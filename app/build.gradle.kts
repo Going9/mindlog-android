@@ -36,7 +36,7 @@ android {
     productFlavors {
         create("dev") {
             dimension = "environment"
-            buildConfigField("String", "BASE_URL", "\"https://10.0.2.2:8443\"")
+            buildConfigField("String", "BASE_URL", "\"https://127.0.0.1:8443\"")
         }
         create("prod") {
             dimension = "environment"
