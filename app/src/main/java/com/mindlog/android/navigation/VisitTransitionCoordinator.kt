@@ -1,7 +1,5 @@
 package com.mindlog.android.navigation
 
-import android.os.Handler
-import android.os.Looper
 import android.os.SystemClock
 
 interface VisitTransitionOverlayRenderer {
@@ -17,17 +15,17 @@ class VisitTransitionCoordinator(
     private val renderer: VisitTransitionOverlayRenderer,
     private val minVisibleMs: Long = DEFAULT_MIN_VISIBLE_MS,
     private val maxVisibleMs: Long = DEFAULT_MAX_VISIBLE_MS,
+    private val scheduler: VisitTransitionScheduler = MainLooperVisitTransitionScheduler(),
     private val nowMs: () -> Long = { SystemClock.elapsedRealtime() }
 ) {
-    private val mainHandler = Handler(Looper.getMainLooper())
     private var activeVisitId = 0L
     private var startedAtMs = 0L
     private var terminalSignaled = false
-    private var hideRunnable: Runnable? = null
-    private var watchdogRunnable: Runnable? = null
+    private var hideTask: CancellableTask? = null
+    private var watchdogTask: CancellableTask? = null
 
     fun onVisitStarted() {
-        runOnMain {
+        runOnScheduler {
             val visitId = activeVisitId + 1L
             activeVisitId = visitId
             startedAtMs = nowMs()
@@ -39,10 +37,10 @@ class VisitTransitionCoordinator(
     }
 
     fun onVisitTerminal() {
-        runOnMain {
+        runOnScheduler {
             val visitId = activeVisitId
             if (visitId == 0L || terminalSignaled) {
-                return@runOnMain
+                return@runOnScheduler
             }
 
             terminalSignaled = true
@@ -51,20 +49,18 @@ class VisitTransitionCoordinator(
 
             if (remainingMs <= 0L) {
                 finishVisitIfActive(visitId)
-                return@runOnMain
+                return@runOnScheduler
             }
 
             cancelHideTimer()
-            hideRunnable = Runnable {
+            hideTask = scheduler.schedule(remainingMs) {
                 finishVisitIfActive(visitId)
-            }.also { runnable ->
-                mainHandler.postDelayed(runnable, remainingMs)
             }
         }
     }
 
     fun reset() {
-        runOnMain {
+        runOnScheduler {
             cancelHideTimer()
             cancelWatchdogTimer()
             activeVisitId = 0L
@@ -89,30 +85,28 @@ class VisitTransitionCoordinator(
 
     private fun startWatchdog(visitId: Long) {
         cancelWatchdogTimer()
-        watchdogRunnable = Runnable {
+        watchdogTask = scheduler.schedule(maxVisibleMs) {
             finishVisitIfActive(visitId)
-        }.also { runnable ->
-            mainHandler.postDelayed(runnable, maxVisibleMs)
         }
     }
 
     private fun cancelHideTimer() {
-        hideRunnable?.let(mainHandler::removeCallbacks)
-        hideRunnable = null
+        hideTask?.cancel()
+        hideTask = null
     }
 
     private fun cancelWatchdogTimer() {
-        watchdogRunnable?.let(mainHandler::removeCallbacks)
-        watchdogRunnable = null
+        watchdogTask?.cancel()
+        watchdogTask = null
     }
 
-    private fun runOnMain(block: () -> Unit) {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
+    private fun runOnScheduler(block: () -> Unit) {
+        if (scheduler.isSchedulerThread()) {
             block()
             return
         }
 
-        mainHandler.post(block)
+        scheduler.dispatch(block)
     }
 
     private companion object {
