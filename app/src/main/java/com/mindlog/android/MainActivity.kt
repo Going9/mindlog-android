@@ -9,41 +9,6 @@ import com.mindlog.android.navigation.VisitTransitionCoordinatorOwner
 import com.mindlog.android.navigation.VisitTransitionOverlayRenderer
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
-
-internal object AuthRouteBuilder {
-    private const val CALLBACK_SCHEME = "mindlog"
-    private const val CALLBACK_HOST = "auth"
-    private const val CALLBACK_PATH = "/callback"
-
-    fun isAuthCallback(scheme: String?, host: String?, path: String?): Boolean {
-        return scheme == CALLBACK_SCHEME && host == CALLBACK_HOST && path == CALLBACK_PATH
-    }
-
-    fun buildExchangeUrl(baseUrl: String, token: String): String {
-        val encodedToken = URLEncoder.encode(token, StandardCharsets.UTF_8)
-        return "$baseUrl/auth/exchange?token=$encodedToken"
-    }
-}
-
-internal class HandoverTokenDeduplicator(
-    private val duplicateWindowMillis: Long = 5_000
-) {
-    private var lastToken: String? = null
-    private var lastHandledAtMillis: Long = 0
-
-    fun shouldProcess(token: String, nowMillis: Long = System.currentTimeMillis()): Boolean {
-        val isDuplicate = token == lastToken && (nowMillis - lastHandledAtMillis) <= duplicateWindowMillis
-        if (isDuplicate) {
-            return false
-        }
-
-        lastToken = token
-        lastHandledAtMillis = nowMillis
-        return true
-    }
-}
 
 class MainActivity : HotwireActivity(), VisitTransitionOverlayRenderer, VisitTransitionCoordinatorOwner {
 
