@@ -3,6 +3,10 @@ package com.mindlog.android
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import com.mindlog.android.navigation.VisitTransitionCoordinator
+import com.mindlog.android.navigation.VisitTransitionCoordinatorOwner
+import com.mindlog.android.navigation.VisitTransitionOverlayRenderer
 import dev.hotwire.navigation.activities.HotwireActivity
 import dev.hotwire.navigation.navigator.NavigatorConfiguration
 import java.net.URLEncoder
@@ -41,16 +45,23 @@ internal class HandoverTokenDeduplicator(
     }
 }
 
-class MainActivity : HotwireActivity() {
+class MainActivity : HotwireActivity(), VisitTransitionOverlayRenderer, VisitTransitionCoordinatorOwner {
 
     companion object {
         private const val TAG = "MainActivity"
         private val handoverTokenDeduplicator = HandoverTokenDeduplicator()
     }
 
+    override val visitTransitionCoordinator: VisitTransitionCoordinator by lazy {
+        VisitTransitionCoordinator(this)
+    }
+
+    private lateinit var transitionOverlay: View
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        transitionOverlay = findViewById(R.id.native_transition_overlay)
         Log.d(TAG, "앱 시작 BASE_URL=${BuildConfig.BASE_URL}")
 
         handleDeepLink(intent)
@@ -68,6 +79,30 @@ class MainActivity : HotwireActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleDeepLink(intent)
+    }
+
+    override fun onDestroy() {
+        visitTransitionCoordinator.reset()
+        super.onDestroy()
+    }
+
+    override fun showVisitTransitionOverlay() {
+        if (!::transitionOverlay.isInitialized) {
+            return
+        }
+
+        transitionOverlay.clearAnimation()
+        transitionOverlay.alpha = 1f
+        transitionOverlay.visibility = View.VISIBLE
+    }
+
+    override fun hideVisitTransitionOverlay() {
+        if (!::transitionOverlay.isInitialized) {
+            return
+        }
+
+        transitionOverlay.clearAnimation()
+        transitionOverlay.visibility = View.GONE
     }
 
     private fun handleDeepLink(intent: Intent?) {
