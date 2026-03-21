@@ -1,5 +1,7 @@
 package com.mindlog.android.navigation
 
+import android.graphics.Color
+import android.os.Bundle
 import android.view.View
 import android.widget.Space
 import dev.hotwire.core.turbo.errors.VisitError
@@ -11,6 +13,12 @@ class MindlogWebFragment : HotwireWebFragment() {
 
     private val transitionCoordinator: VisitTransitionCoordinator?
         get() = (activity as? VisitTransitionCoordinatorOwner)?.visitTransitionCoordinator
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // WebView 배경색을 앱 배경과 일치시켜 흰색 flash 방지
+        view.setBackgroundColor(Color.parseColor("#F7F7F4"))
+    }
 
     override fun createProgressView(location: String): View {
         // Progress is rendered by an Activity-level overlay managed by VisitTransitionCoordinator.

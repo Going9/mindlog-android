@@ -67,7 +67,11 @@ class MainActivity : HotwireActivity(), VisitTransitionOverlayRenderer, VisitTra
         }
 
         transitionOverlay.clearAnimation()
-        transitionOverlay.visibility = View.GONE
+        transitionOverlay.animate()
+            .alpha(0f)
+            .setDuration(120)
+            .withEndAction { transitionOverlay.visibility = View.GONE }
+            .start()
     }
 
     private fun handleDeepLink(intent: Intent?) {
